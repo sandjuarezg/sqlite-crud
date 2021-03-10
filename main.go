@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/SandGG/sqlite/crud/function"
+	"github.com/sandjuarezg/sqlite-crud/function"
 
-	"github.com/SandGG/sqlite/crud/user"
+	"github.com/sandjuarezg/sqlite-crud/user"
 )
 
 func main() {
