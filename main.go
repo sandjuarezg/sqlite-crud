@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/SandGG/sqlite/crud/function"
+	"github.com/sandjuarezg/sqlite-crud/function"
 
-	"github.com/SandGG/sqlite/crud/user"
+	"github.com/sandjuarezg/sqlite-crud/user"
 )
 
 func main() {
@@ -23,16 +23,16 @@ func main() {
 
 		switch opc {
 		case 1:
-			user.Hello()
+			user.InsertData()
 			function.CleanConsole()
 		case 2:
-
+			user.ReadData()
 			function.CleanConsole()
 		case 3:
-
+			user.UpdateData()
 			function.CleanConsole()
 		case 4:
-
+			user.DeleteData()
 			function.CleanConsole()
 		case 5:
 			fmt.Println("E X I T . . .")
