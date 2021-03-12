@@ -26,13 +26,28 @@ func main() {
 			user.InsertData()
 			function.CleanConsole()
 		case 2:
-			user.ReadData()
+			var err = user.ReadData()
+			if err != nil {
+				fmt.Println("Problem: Table blank")
+			}
 			function.CleanConsole()
 		case 3:
-			user.UpdateData()
+			var n = user.UpdateData()
+			if n == -1 {
+				fmt.Println("Problem: Table blank")
+			}
+			if n == 0 {
+				fmt.Println("Problem: Not found id")
+			}
 			function.CleanConsole()
 		case 4:
-			user.DeleteData()
+			var n = user.DeleteData()
+			if n == -1 {
+				fmt.Println("Problem:  Table blank")
+			}
+			if n == 0 {
+				fmt.Println("Problem: Not found id")
+			}
 			function.CleanConsole()
 		case 5:
 			fmt.Println("E X I T . . .")

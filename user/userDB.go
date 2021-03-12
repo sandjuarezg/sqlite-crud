@@ -45,7 +45,7 @@ func InsertData() {
 	statement.Exec(user.name, user.username, user.pass)
 }
 
-func ReadData() {
+func ReadData() error {
 	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
 	defer db.Close()
 	if errOpen != nil {
@@ -53,23 +53,32 @@ func ReadData() {
 	}
 
 	var rows, errSelect = db.Query("SELECT * FROM users")
-	defer rows.Close()
 	if errSelect != nil {
-		log.Fatal(errSelect)
+		return errSelect
 	}
+	defer rows.Close()
 
 	var user = user{}
+	fmt.Printf("|%-6s|%-15s|%-15s|%-15s|\n", "id", "Name", "User name", "Password")
+	fmt.Println("________________________________________________________")
 	for rows.Next() {
 		rows.Scan(&user.id, &user.name, &user.username, &user.pass)
 		fmt.Printf("|%-6d|%-15s|%-15s|%-15s|\n", user.id, user.name, user.username, user.pass)
 	}
+
+	return nil
 }
 
-func UpdateData() {
+func UpdateData() int64 {
 	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
 	defer db.Close()
 	if errOpen != nil {
 		log.Fatal(errOpen)
+	}
+
+	var _, errSelect = db.Query("SELECT * FROM users")
+	if errSelect != nil {
+		return -1
 	}
 
 	var statement, err = db.Prepare("UPDATE users SET pass = ? WHERE id = ?")
@@ -85,14 +94,21 @@ func UpdateData() {
 	fmt.Scan(&user.pass)
 
 	var res, _ = statement.Exec(user.pass, user.id)
-	res.RowsAffected()
+	var n, _ = res.RowsAffected()
+
+	return n
 }
 
-func DeleteData() {
+func DeleteData() int64 {
 	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
 	defer db.Close()
 	if errOpen != nil {
 		log.Fatal(errOpen)
+	}
+
+	var _, errSelect = db.Query("SELECT * FROM users")
+	if errSelect != nil {
+		return -1
 	}
 
 	var statement, err = db.Prepare("DELETE from users WHERE id = ?")
@@ -105,5 +121,7 @@ func DeleteData() {
 	fmt.Println("Enter id")
 	fmt.Scan(&user.id)
 	var res, _ = statement.Exec(user.id)
-	res.RowsAffected()
+	var n, _ = res.RowsAffected()
+
+	return n
 }
