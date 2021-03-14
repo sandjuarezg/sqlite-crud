@@ -16,24 +16,25 @@ type user struct {
 }
 
 func InsertData() {
-	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
-	defer db.Close()
-	if errOpen != nil {
-		log.Fatal(errOpen)
-	}
-
-	var statement, err = db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, username TEXT, pass TEXT)")
-	defer statement.Close()
+	var db, err = sql.Open("sqlite3", "./user/userdata.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
+	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, username TEXT, pass TEXT)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
 	statement.Exec()
 
 	statement, err = db.Prepare("INSERT INTO users (name, username, pass) VALUES (?, ?, ?)")
-	defer statement.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer statement.Close()
+
 	var user = user{}
 	fmt.Println("Enter a name")
 	fmt.Scan(&user.name)
@@ -46,15 +47,15 @@ func InsertData() {
 }
 
 func ReadData() error {
-	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
-	defer db.Close()
-	if errOpen != nil {
-		log.Fatal(errOpen)
+	var db, err = sql.Open("sqlite3", "./user/userdata.db")
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer db.Close()
 
-	var rows, errSelect = db.Query("SELECT * FROM users")
-	if errSelect != nil {
-		return errSelect
+	rows, err := db.Query("SELECT id, name, username, pass FROM users")
+	if err != nil {
+		return err
 	}
 	defer rows.Close()
 
@@ -70,22 +71,22 @@ func ReadData() error {
 }
 
 func UpdateData() int64 {
-	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
-	defer db.Close()
-	if errOpen != nil {
-		log.Fatal(errOpen)
-	}
-
-	var _, errSelect = db.Query("SELECT * FROM users")
-	if errSelect != nil {
-		return -1
-	}
-
-	var statement, err = db.Prepare("UPDATE users SET pass = ? WHERE id = ?")
-	defer statement.Close()
+	var db, err = sql.Open("sqlite3", "./user/userdata.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
+	_, err = db.Query("SELECT * FROM users")
+	if err != nil {
+		return -1
+	}
+
+	statement, err := db.Prepare("UPDATE users SET pass = ? WHERE id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
 
 	var user = user{}
 	fmt.Println("Enter id")
@@ -100,22 +101,22 @@ func UpdateData() int64 {
 }
 
 func DeleteData() int64 {
-	var db, errOpen = sql.Open("sqlite3", "./user/userdata.db")
-	defer db.Close()
-	if errOpen != nil {
-		log.Fatal(errOpen)
+	var db, err = sql.Open("sqlite3", "./user/userdata.db")
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer db.Close()
 
 	var _, errSelect = db.Query("SELECT * FROM users")
 	if errSelect != nil {
 		return -1
 	}
 
-	var statement, err = db.Prepare("DELETE from users WHERE id = ?")
-	defer statement.Close()
+	statement, err := db.Prepare("DELETE from users WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer statement.Close()
 
 	var user = user{}
 	fmt.Println("Enter id")
