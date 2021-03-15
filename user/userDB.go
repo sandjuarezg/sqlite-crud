@@ -17,7 +17,7 @@ type user struct {
 	pass     string
 }
 
-func sqlMigration() {
+func SqlMigration() {
 	var db, err = sql.Open("sqlite3", "./user/userdata.db")
 	if err != nil {
 		log.Fatal(err)
@@ -48,7 +48,6 @@ func InsertData() {
 	}
 	defer db.Close()
 
-	sqlMigration()
 	statement, err := db.Prepare("INSERT INTO users (name, username, pass) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)

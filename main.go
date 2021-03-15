@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	user.SqlMigration()
 	var opc int
 	var exit bool
 
