@@ -3,7 +3,9 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -22,14 +24,23 @@ func InsertData() {
 	}
 	defer db.Close()
 
-	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, username TEXT, pass TEXT)")
+	file, err := os.Open("./migration.sql")
+	if err != nil {
+		log.Fatal("File not found")
+	}
+	defer file.Close()
+
+	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer statement.Close()
-	statement.Exec()
 
-	statement, err = db.Prepare("INSERT INTO users (name, username, pass) VALUES (?, ?, ?)")
+	_, err = db.Exec(string(content))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	statement, err := db.Prepare("INSERT INTO users (name, username, pass) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,8 +118,8 @@ func DeleteData() int64 {
 	}
 	defer db.Close()
 
-	var _, errSelect = db.Query("SELECT * FROM users")
-	if errSelect != nil {
+	_, err = db.Query("SELECT * FROM users")
+	if err != nil {
 		return -1
 	}
 
