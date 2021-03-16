@@ -18,39 +18,46 @@ type user struct {
 }
 
 func SqlMigration() {
-	var file, err = os.Open("./migration.sql")
-	if err != nil {
-		log.Fatal("File not found")
+	//Check migraton.sql
+	var _, err = os.Stat("./migration.sql")
+	if os.IsNotExist(err) {
+		var file, err = os.Create("./migration.sql")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
 	}
-	defer file.Close()
 
+	//Get content
+	file, _ := os.Open("./migration.sql")
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := sql.Open("sqlite3", "./user/userdata.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	//If .db not exists
-	fileDB, err := os.Create("./user/userdata.db")
-	if err != nil {
-		return
-	}
-	defer fileDB.Close()
-
-	//If table not exists
-	_, err = db.Query("SELECT * FROM users")
-	if err != nil {
-		_, err = db.Exec(string(content))
+	//Check userdata.db
+	_, err = os.Stat("./user/userdata.db")
+	if os.IsNotExist(err) {
+		var file, err = os.Create("./user/userdata.db")
 		if err != nil {
 			log.Fatal(err)
 		}
-	}
+		defer file.Close()
 
+		db, err := sql.Open("sqlite3", "./user/userdata.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+		_, err = db.Query("SELECT * FROM users")
+		if err != nil {
+			_, err = db.Exec(string(content))
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
 }
 
 func InsertData() {
