@@ -18,13 +18,7 @@ type user struct {
 }
 
 func SqlMigration() {
-	var db, err = sql.Open("sqlite3", "./user/userdata.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	file, err := os.Open("./migration.sql")
+	var file, err = os.Open("./migration.sql")
 	if err != nil {
 		log.Fatal("File not found")
 	}
@@ -35,10 +29,28 @@ func SqlMigration() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec(string(content))
+	db, err := sql.Open("sqlite3", "./user/userdata.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
+	//If .db not exists
+	fileDB, err := os.Create("./user/userdata.db")
+	if err != nil {
+		return
+	}
+	defer fileDB.Close()
+
+	//If table not exists
+	_, err = db.Query("SELECT * FROM users")
+	if err != nil {
+		_, err = db.Exec(string(content))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 }
 
 func InsertData() {
