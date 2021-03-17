@@ -57,6 +57,19 @@ func SqlMigration() {
 				log.Fatal(err)
 			}
 		}
+	} else {
+		db, err := sql.Open("sqlite3", "./user/userdata.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+		_, err = db.Query("SELECT * FROM users")
+		if err != nil {
+			_, err = db.Exec(string(content))
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
 }
 
