@@ -21,20 +21,16 @@ func SqlMigration() {
 	//Check migraton.sql
 	var _, err = os.Stat("./migration.sql")
 	if os.IsNotExist(err) {
-		var file, err = os.Create("./migration.sql")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
+		log.Fatal(err)
 	}
 
 	//Get content
 	file, _ := os.Open("./migration.sql")
-	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	//Check userdata.db
 	_, err = os.Stat("./user/userdata.db")
@@ -45,30 +41,20 @@ func SqlMigration() {
 		}
 		defer file.Close()
 
-		db, err := sql.Open("sqlite3", "./user/userdata.db")
+	}
+
+	//Check table
+	db, err := sql.Open("sqlite3", "./user/userdata.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query("SELECT * FROM users")
+	if err != nil {
+		_, err = db.Exec(string(content))
 		if err != nil {
 			log.Fatal(err)
-		}
-		defer db.Close()
-		_, err = db.Query("SELECT * FROM users")
-		if err != nil {
-			_, err = db.Exec(string(content))
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	} else {
-		db, err := sql.Open("sqlite3", "./user/userdata.db")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer db.Close()
-		_, err = db.Query("SELECT * FROM users")
-		if err != nil {
-			_, err = db.Exec(string(content))
-			if err != nil {
-				log.Fatal(err)
-			}
 		}
 	}
 }
